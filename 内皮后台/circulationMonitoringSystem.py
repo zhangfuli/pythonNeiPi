@@ -39,50 +39,37 @@ def SFM(psd):
     SFM = geometric/arithmetic
     return SFM
     
+ser = serial.Serial('COM5', 115200, timeout=0.5)
 #生成随机数
 plt.xlim(0,20)
-plt.ylim(0,1)
+plt.ylim(0,4)
 plt.ion()
 y = []
 i = 0  #用于横坐标的变化
 t = 0   #用于显示一组数据
 while True:
-    temp = np.random.random()
+    ser.flushInput()
+    temp =ser.read(8)
+    sleep(1)   #单位秒
     i += 1
     y.append(temp)
     if i>=100:
         if t == 0:
             print "normalization"
-            print normalization(y)
+#            print normalization(y)
             #滤波 低通0.6高通25     
-            b, a = butter_bandpass(0.6,25,20000.0,order = 5)
-            sig = scipy.signal.filtfilt(b, a,normalization(y))
+#            b, a = butter_bandpass(0.6,25,20000.0,order = 5)
+#            sig = scipy.signal.filtfilt(b, a,normalization(y))
             # 先求psd再求SFM    CI=1-SFM
             print "SFM" 
-            print SFM(PSD(sig))
-            sfm = SFM(PSD(sig))
+#            print SFM(PSD(sig))
+#            sfm = SFM(PSD(sig))
             #求取CI
             print "CI"
-            print 1-sfm
+#            print 1-sfm
         t=t+1        
     if i>20:
     	plt.xlim(i-20,i)
+   # print y
     plt.plot(y)
-    plt.pause(0.1)
-
-
-#ser = serial.Serial('COM4', 115200, timeout=0.5)
-#plt.ion()  #  开启matplotlib的交互模式
-#plt.xlim(0,50)  #首先得设置一个x轴的区间 这个是必须的
-#plt.ylim(-19.58,19.58) # y轴区间 
-#acc_speed = []
-#i = 0  #计数。然x轴能到了初始状态的最大值能进行改变
-#while True:
-#	ser.flushInput()#清除缓冲区
-#	temp =ser.read(8) #读取传来的6个字符
-#	acc_speed.append(temp)  #存入list里面
-#	i += 1
-#	if i>50:    #初始状态x轴最大为50
-#		plt.xlim(i-50,i) #  如果当前坐标x已经超过了50，将x的轴的范围右移。
-#	plt.plot(y) #将list传入plot画图
-#	plt.pause(0.01) # 这个为停顿0.01s，能得到产生实时的效果
+    plt.pause(0.1) # 这个为停顿0.01s，能得到产生实时的效果
