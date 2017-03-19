@@ -11,5 +11,8 @@ module.exports = function (app) {
 			res.redirect('/login');
 		}
 	});
-	app.get('/user' ,users.getCI);
+	app.get('/user',function (req, res){
+		res.render('index');
+	})
+	app.get('/user/getCI',users.getCI);
 };

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import time
+from pymongo import *
 import numpy as np 
 from matplotlib import pyplot as plt 
 from scipy.stats import gmean
@@ -38,8 +40,19 @@ def SFM(psd):
     # print gmean([1,2])
     SFM = geometric/arithmetic
     return SFM
-    
-ser = serial.Serial('COM5', 115200, timeout=0.5)
+
+# 获取当前时间
+localtime = time.asctime( time.localtime(time.time()) )
+#链接数据库
+client = MongoClient() 
+client = MongoClient("mongodb://localhost:27017/test")
+
+db = client.test
+collection = db.test_collection
+
+mydict = {}
+#串口    
+ser = serial.Serial('COM5', 115200)
 #生成随机数
 plt.xlim(0,20)
 plt.ylim(0,4)
@@ -50,22 +63,25 @@ t = 0   #用于显示一组数据
 while True:
     ser.flushInput()
     temp =ser.read(8)
-    sleep(1)   #单位秒
+    sleep(0.1)   #单位秒
     i += 1
     y.append(temp)
     if i>=100:
         if t == 0:
             print "normalization"
-#            print normalization(y)
+ #           print normalization(y)
             #滤波 低通0.6高通25     
 #            b, a = butter_bandpass(0.6,25,20000.0,order = 5)
 #            sig = scipy.signal.filtfilt(b, a,normalization(y))
             # 先求psd再求SFM    CI=1-SFM
             print "SFM" 
-#            print SFM(PSD(sig))
+ #           print SFM(PSD(normalization(y)))
 #            sfm = SFM(PSD(sig))
             #求取CI
             print "CI"
+#            CI =1 - sfm
+            mydict = {"name":"test","time":localtime,"CI":0.6}
+            collection.insert_one(mydict)
 #            print 1-sfm
         t=t+1        
     if i>20:
